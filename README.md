@@ -1,0 +1,2 @@
+# ClarifySimplify
+Automating Clarify 
