@@ -44,6 +44,9 @@ class ClarifySimplify(tkinter.Frame):
 
         self.screenWidth = self.winfo_screenwidth()
         self.screenHeight = self.winfo_screenheight()
+        self.clarifyIconQueue = self._makeRegion(0, 0, round(self.screenWidth*.288), round(self.screenHeight/2))
+
+        #self.clarifyIconPixel = None
 
         textBoxLabel1 = tkinter.Label(text='Reason Calling', bg=self.colorDarkBackground, fg=self.colorLimeText, font = self.defaultFont)
         textBoxLabel1.grid(row=0, column=0, sticky='SNEW')
@@ -89,14 +92,11 @@ class ClarifySimplify(tkinter.Frame):
     ####################################
     def _locateClarify(self, iconSearch):
         if iconSearch == True:
-            self.regionLeftX = 0
-            self.regionTopY = round(self.screenHeight* .957)
-            self.regionWidth = round(self.screenWidth* (.863 ))
-            self.regionHeight = round(self.screenHeight* (1-.957))
-            self.region = self.regionLeftX, self.regionTopY, self.regionWidth, self.regionHeight
-            self.clarifyLocation = pyautogui.locateCenterOnScreen('clarifyicon.png', region=self.region, grayscale=True)
-            
-            return
+            self.region = self._makeRegion(0, round(self.screenHeight* .957), round(self.screenWidth*.863), self.screenHeight)
+            self.clarifyLocation = pyautogui.locateCenterOnScreen('clarifyicon.png', region=self.region)
+            print(self.clarifyLocation)
+            print(self.region)
+
         else:
             self.windowLocateClarify = tkinter.Toplevel()
             self.windowLocateClarify.title("Locating Clarify...")
@@ -109,8 +109,14 @@ class ClarifySimplify(tkinter.Frame):
             message.grid(column=0, row = 0, sticky='NSEW')
             self.windowLocateClarify.columnconfigure(0, weight=1)
             self.windowLocateClarify.rowconfigure(0, weight=1)
-            return
+            
 
+
+
+
+    def _makeRegion(self, regionMostLeft, regionMostTop, regionWidth, regionHeight):
+        self.newRegion = regionMostLeft, regionMostTop, regionWidth, regionHeight
+        return self.newRegion
 
     def _keyboard_handler(self, event):
         if event.keysym == '1':
@@ -163,7 +169,7 @@ class ClarifySimplify(tkinter.Frame):
             pyautogui.click(self.clarifyLocation)
             pyautogui.moveTo(currentMousePosition) ###ONLY MOVES WITHIN PRIMARY SCREEN##
             pyautogui.press('p')
-            time.sleep(.5)
+            #time.sleep(.5)
             pyautogui.press('p')
             pyautogui.hotkey('alt', 'tab') #return to this program#
 
