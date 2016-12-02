@@ -94,8 +94,6 @@ class ClarifySimplify(tkinter.Frame):
         if iconSearch == True:
             self.region = self._makeRegion(0, round(self.screenHeight* .957), round(self.screenWidth*.863), self.screenHeight)
             self.clarifyLocation = pyautogui.locateCenterOnScreen('clarifyicon.png', region=self.region)
-            print(self.clarifyLocation)
-            print(self.region)
 
         else:
             self.windowLocateClarify = tkinter.Toplevel()
