@@ -15,7 +15,9 @@
 import tkinter
 import re
 import pyautogui
+import pyperclip
 import time
+import os
  
 class ClarifySimplify(tkinter.Frame):
  
@@ -30,6 +32,9 @@ class ClarifySimplify(tkinter.Frame):
 
  
     def _initialize(self):
+
+        self.filePath = os.path.dirname(__file__)
+        self.iconFilePath = os.path.join(self.filePath, 'clarifyicon.png')
 
         self.defaultFont = ('Times', '16', 'bold')
         self.textWidgetFont = ('Times', '12')
@@ -88,12 +93,13 @@ class ClarifySimplify(tkinter.Frame):
         self.update()
 
       
-    ##Search Taskbar for pixelicon.png##
+    ##Search Taskbar for pixelicon.png##  =======Consider Removing, slow/doesn't work right==========
     ####################################
     def _locateClarify(self, iconSearch):
         if iconSearch == True:
             self.region = self._makeRegion(0, round(self.screenHeight* .957), round(self.screenWidth*.863), self.screenHeight)
-            self.clarifyLocation = pyautogui.locateCenterOnScreen('clarifyicon.png', region=self.region)
+            self.clarifyLocation = pyautogui.locateCenterOnScreen(str(self.iconFilePath), region=self.region)
+            print(self.clarifyLocation)
 
         else:
             self.windowLocateClarify = tkinter.Toplevel()
@@ -136,26 +142,73 @@ class ClarifySimplify(tkinter.Frame):
         self.textBox1.insert(1.0, "===============\nREASON CALLING\n===============\n")
         for i in range(0, (int(self.textBox1.index('end').split('.')[0]) - 1)):
             self.textBox1.insert(i+1.0, "@ ")
+        self.textBox1.insert('end', "\n\n")
 
         self.textBox2.insert(1.0, "================\nATTEMPTED STEPS\n================\n")
         for i in range(0, (int(self.textBox2.index('end').split('.')[0]) - 1)):
             self.textBox2.insert(i+1.0, "! ")
+        self.textBox2.insert('end', "\n\n")
 
         self.textBox3.insert(1.0, "=================\nRESOLUTION STEPS\n=================\n")
         for i in range(0, (int(self.textBox3.index('end').split('.')[0]) - 1)):
-            self.textBox3.insert(i+1.0, "- ")    
+            self.textBox3.insert(i+1.0, "- ") 
+        self.textBox3.insert('end', "\n\n")   
 
         ####Save formatted text to temp var#############
         ################################################
-        text_reason_calling = self.textBox1.get(1.0, 'end') 
-        text_attempted_steps = self.textBox2.get(1.0, 'end')
-        text_resolution_steps = self.textBox3.get(1.0, 'end')
+        self.text_reason_calling = self.textBox1.get(1.0, 'end') 
+        self.text_attempted_steps = self.textBox2.get(1.0, 'end')
+        self.text_resolution_steps = self.textBox3.get(1.0, 'end')
+
+        print(self.text_resolution_steps)
+        print(self.text_attempted_steps)
+        print(self.text_reason_calling)
+
+        self._setup_ticket()
+
 
     def _setup_ticket(self):
-        print("stuff")
-        ####################
-        ##UNFINISHED#########
-        #####################
+
+        pyautogui.click(self.clarifyLocation)
+        time.sleep(.5)
+        pyautogui.hotkey('ctrl', 'h')
+        time.sleep(.5)
+        pyautogui.click(self.screenWidth*.5, self.screenHeight*.6)
+        for i in range(0,6):
+            pyautogui.press('tab')
+            print(i)
+        pyautogui.press('down')
+        for i in range(0,3):
+            pyautogui.press('tab')
+        pyperclip.copy(self.text_reason_calling)
+        pyautogui.hotkey('ctrl', 'v')
+        time.sleep(.15)
+        pyperclip.copy(self.text_attempted_steps)
+        pyautogui.hotkey('ctrl', 'v')
+        time.sleep(.15)
+        pyperclip.copy(self.text_resolution_steps)
+        pyautogui.hotkey('ctrl', 'v')
+        time.sleep(.15)
+
+        '''
+        ###### Add notes to case #####
+        ======================================================
+            Control + H to get into Call Log
+            Click Once -- Notes Section -- CALL LOG  (50, 60) #############VERIFY WORKING ON ALL MONITORS###########
+            Tab x5 to phone #
+            Tab x1 to Outgoing call
+            Down arrow x1 to set outgoing call
+            Tab x3 back to Notes Section
+            Tab x2 HangUp
+
+            #Check if closing or deferring
+
+            I attempted to test test customers test
+            verified that the test was a successful test
+            changed test settings to test to fix problem.
+
+
+        '''
 
     def _refresh_clarify(self):
 
@@ -164,12 +217,18 @@ class ClarifySimplify(tkinter.Frame):
 
         if self.clarifyLocation is not None:
             currentMousePosition = pyautogui.position()
+            clarifyRefreshColumnLocation = (self.screenWidth * .2), (self.screenHeight * .4)
             pyautogui.click(self.clarifyLocation)
+            pyautogui.click(clarifyRefreshColumnLocation)
             pyautogui.moveTo(currentMousePosition) ###ONLY MOVES WITHIN PRIMARY SCREEN##
             pyautogui.press('p')
             #time.sleep(.5)
             pyautogui.press('p')
             pyautogui.hotkey('alt', 'tab') #return to this program#
+
+            '''
+                Blank space 20, 40 (262, 410)
+            '''
 
  
  
@@ -190,3 +249,5 @@ if __name__ == "__main__":
     application.grid()
     application.configure
     application.mainloop()
+
+
