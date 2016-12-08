@@ -97,8 +97,8 @@ class ClarifySimplify(tkinter.Frame):
     ####################################
     def _locateClarify(self, iconSearch):
         if iconSearch == True:
-            self.region = self._makeRegion(0, round(self.screenHeight* .957), round(self.screenWidth*.863), self.screenHeight)
-            self.clarifyLocation = pyautogui.locateCenterOnScreen(str(self.iconFilePath), region=self.region)
+            self.taskBarRegion = self._makeRegion(0, round(self.screenHeight* .957), round(self.screenWidth*.863), self.screenHeight)
+            self.clarifyLocation = pyautogui.locateCenterOnScreen(str(self.iconFilePath), region=self.taskBarRegion)
             print(self.clarifyLocation)
 
         else:
@@ -160,35 +160,67 @@ class ClarifySimplify(tkinter.Frame):
         self.text_attempted_steps = self.textBox2.get(1.0, 'end')
         self.text_resolution_steps = self.textBox3.get(1.0, 'end')
 
-        print(self.text_resolution_steps)
-        print(self.text_attempted_steps)
-        print(self.text_reason_calling)
-
         self._setup_ticket()
 
 
     def _setup_ticket(self):
 
-        pyautogui.click(self.clarifyLocation)
-        time.sleep(.5)
+        pyautogui.click(self.clarifyLocation) #Ensure clarify is focused window
         pyautogui.hotkey('ctrl', 'h')
         time.sleep(.5)
-        pyautogui.click(self.screenWidth*.5, self.screenHeight*.6)
+        pyautogui.click(self.screenWidth*.5, self.screenHeight*.6) #Select correct text box for tab positioning
         for i in range(0,6):
             pyautogui.press('tab')
-            print(i)
-        pyautogui.press('down')
+        pyautogui.press('down') #Change from incoming to outgoing
         for i in range(0,3):
             pyautogui.press('tab')
+        
+        #paste in all fields from this program
         pyperclip.copy(self.text_reason_calling)
         pyautogui.hotkey('ctrl', 'v')
-        time.sleep(.15)
         pyperclip.copy(self.text_attempted_steps)
         pyautogui.hotkey('ctrl', 'v')
-        time.sleep(.15)
         pyperclip.copy(self.text_resolution_steps)
         pyautogui.hotkey('ctrl', 'v')
-        time.sleep(.15)
+        for i in range(0,2): #3 tabs to hit hangup
+            pyautogui.press('tab')
+        #######pyautogui.press('space') #press hangup
+
+        #CLOSE CALL SPLIT 15 tabs to close case,
+        '''
+        for i in range(0,16):
+            pyautogui.press('tab')
+        pyautogui.press('enter')
+        pyautogui.press('esc')
+        for i in range(0,4)
+            pyautogui.press('enter')
+        pyautogui.hotkey('control', 'v')
+        for i in range(0,10)
+            pyautogui.press('tab') #Restoral date
+        enter x2
+        tabx3 closing codes
+
+            Verifone Reboot Close codes
+            h, h, e, e, e, h, 3, 3, p 
+        tabx6
+        enter
+        '''
+
+
+        
+        #DEFER CALL SPLIT 18 tabs for defer
+        '''
+        for i in range(0,19):  
+            pyautogui.press('tab')
+        pyautogui.press('space')
+        time.sleep(5)
+        pyautogui.press('enter')
+        pyautogui.hotkey('ctrl', 'd')
+        pyautogui.typewrite('pix')
+        #pyautogui.press('enter') 
+        '''
+
+
 
         '''
         ###### Add notes to case #####
@@ -200,6 +232,26 @@ class ClarifySimplify(tkinter.Frame):
             Down arrow x1 to set outgoing call
             Tab x3 back to Notes Section
             Tab x2 HangUp
+            ---------- DEFER -------------
+            Tab x3 Defer (Might be 12?)
+            Space
+            Grab Defer Time (Set to 5 second pause)
+            Enter
+            Defer Reason - i range(0-7)
+            down x(i)
+            enter
+            Control + d
+            'pix'
+            Enter
+
+            ---------- CLOSE ------------
+            Tab x2 Close
+            Space
+            Enter
+            Esc
+            Enter x3
+
+
 
             #Check if closing or deferring
 
@@ -212,6 +264,7 @@ class ClarifySimplify(tkinter.Frame):
 
     def _refresh_clarify(self):
 
+        #Ensure clarify taskbar icon coords are saved
         if self.clarifyLocation is None:
             self._locateClarify(False)
 
@@ -224,11 +277,10 @@ class ClarifySimplify(tkinter.Frame):
             pyautogui.press('p')
             #time.sleep(.5)
             pyautogui.press('p')
+            time.sleep(.25)
             pyautogui.hotkey('alt', 'tab') #return to this program#
 
-            '''
-                Blank space 20, 40 (262, 410)
-            '''
+            
 
  
  
