@@ -84,6 +84,14 @@ class ClarifySimplify(tkinter.Frame):
         self.button_RefreshClarify = tkinter.Button(text='Refresh Clarify', command = self._refresh_clarify)
         self.button_RefreshClarify.grid(row=6, column=0, sticky='S' )
 
+        self.checkCloseTicket = None
+        self.checkBox_CloseTicket = tkinter.Checkbutton(text='Close Ticket', variable=self.checkCloseTicket, onvalue="True", offvalue="False", bg=self.colorDarkBackground, fg=self.colorOrangeText, font=self.defaultFont)
+        self.checkBox_CloseTicket.grid(column=1, row=2)
+
+        self.checkDeferTicket = None
+        self.checkBox_DeferTicket = tkinter.Checkbutton(text='Defer Ticket', variable=self.checkDeferTicket, onvalue="True", offvalue="False", bg=self.colorDarkBackground, fg=self.colorOrangeText, font=self.defaultFont, highlightbackground=self.colorDarkBackground)
+        self.checkBox_DeferTicket.grid(column=1, row=4)
+   
         self._locateClarify(True)
 
         self.columnconfigure(0, weight=1)
@@ -115,12 +123,10 @@ class ClarifySimplify(tkinter.Frame):
             self.windowLocateClarify.rowconfigure(0, weight=1)
             
 
-
-
-
     def _makeRegion(self, regionMostLeft, regionMostTop, regionWidth, regionHeight):
         self.newRegion = regionMostLeft, regionMostTop, regionWidth, regionHeight
         return self.newRegion
+
 
     def _keyboard_handler(self, event):
         if event.keysym == '1':
@@ -129,42 +135,31 @@ class ClarifySimplify(tkinter.Frame):
         else:
             return
 
+
     def _delete_all_text(self):
         self.textBox1.delete(1.0, 'end')
         self.textBox2.delete(1.0, 'end')
         self.textBox3.delete(1.0, 'end')
  
+
     def _send_to_clarify(self):
-        #########Format All text to conform to ticket standards#######
-        ##############################################################
-
-        #Format Reason Calling#
-        self.textBox1.insert(1.0, "===============\nREASON CALLING\n===============\n")
-        for i in range(0, (int(self.textBox1.index('end').split('.')[0]) - 1)):
-            self.textBox1.insert(i+1.0, "@ ")
-        self.textBox1.insert('end', "\n\n")
-
-        self.textBox2.insert(1.0, "================\nATTEMPTED STEPS\n================\n")
-        for i in range(0, (int(self.textBox2.index('end').split('.')[0]) - 1)):
-            self.textBox2.insert(i+1.0, "! ")
-        self.textBox2.insert('end', "\n\n")
-
-        self.textBox3.insert(1.0, "=================\nRESOLUTION STEPS\n=================\n")
-        for i in range(0, (int(self.textBox3.index('end').split('.')[0]) - 1)):
-            self.textBox3.insert(i+1.0, "- ") 
-        self.textBox3.insert('end', "\n\n")   
-
-        ####Save formatted text to temp var#############
-        ################################################
-        self.text_reason_calling = self.textBox1.get(1.0, 'end') 
-        self.text_attempted_steps = self.textBox2.get(1.0, 'end')
-        self.text_resolution_steps = self.textBox3.get(1.0, 'end')
+        
+        self._insert_ticket_schema() 
 
         self._setup_ticket()
 
+        if self.checkBox_CloseTicket==True: #Check which checkbox is active
+            self._close_ticket()
+        else:
+            return
+
+        if self.checkBox_DeferTicket==True: #Check which checkbox is active
+            self._defer_ticket()
+        else:
+            return
+
 
     def _setup_ticket(self):
-
         pyautogui.click(self.clarifyLocation) #Ensure clarify is focused window
         pyautogui.hotkey('ctrl', 'h')
         time.sleep(.5)
@@ -184,87 +179,107 @@ class ClarifySimplify(tkinter.Frame):
         pyautogui.hotkey('ctrl', 'v')
         for i in range(0,2): #3 tabs to hit hangup
             pyautogui.press('tab')
-        #######pyautogui.press('space') #press hangup
-
-        #CLOSE CALL SPLIT 15 tabs to close case,
-        '''
-        for i in range(0,16):
-            pyautogui.press('tab')
-        pyautogui.press('enter')
-        pyautogui.press('esc')
-        for i in range(0,4)
-            pyautogui.press('enter')
-        pyautogui.hotkey('control', 'v')
-        for i in range(0,10)
-            pyautogui.press('tab') #Restoral date
-        enter x2
-        tabx3 closing codes
-
-            Verifone Reboot Close codes
-            h, h, e, e, e, h, 3, 3, p 
-        tabx6
-        enter
-        '''
+        pyautogui.press('space') #press hangup
 
 
+    def _close_ticket(self):
+        print("UNFINISHED CLOSE TICKET FUNCTION")
+    
+        # Checkbox checked
+        # create new window
+        # Have basic closure codes
+        # include 'Not one of these'
+        # Have a checkbox for closure reason
+        # when box is checked close window
+        # run close functions
+
+
+        #  #CLOSE CALL 15 tabs to close case from main section
         
-        #DEFER CALL SPLIT 18 tabs for defer
-        '''
-        for i in range(0,19):  
-            pyautogui.press('tab')
-        pyautogui.press('space')
-        time.sleep(5)
-        pyautogui.press('enter')
-        pyautogui.hotkey('ctrl', 'd')
-        pyautogui.typewrite('pix')
-        #pyautogui.press('enter') 
-        '''
+        # for i in range(0,16):
+        #     pyautogui.press('tab')
+        # pyautogui.press('enter')
+        # pyautogui.press('esc')
+        # for i in range(0,4)
+        #     pyautogui.press('enter')
+        # pyautogui.hotkey('control', 'v')
+        # for i in range(0,10)
+        #     pyautogui.press('tab') #Restoral date
+        # enter x2
+        # tabx3 closing codes
+
+        #     Verifone Reboot Close codes
+        #     h, h, e, e, e, h, 3, 3, p 
+        #     Online Ordering
+        #     h, s, o, h, px6, p
 
 
+        # tabx6
+        # enter
 
-        '''
-        ###### Add notes to case #####
-        ======================================================
-            Control + H to get into Call Log
-            Click Once -- Notes Section -- CALL LOG  (50, 60) #############VERIFY WORKING ON ALL MONITORS###########
-            Tab x5 to phone #
-            Tab x1 to Outgoing call
-            Down arrow x1 to set outgoing call
-            Tab x3 back to Notes Section
-            Tab x2 HangUp
-            ---------- DEFER -------------
-            Tab x3 Defer (Might be 12?)
-            Space
-            Grab Defer Time (Set to 5 second pause)
-            Enter
-            Defer Reason - i range(0-7)
-            down x(i)
-            enter
-            Control + d
-            'pix'
-            Enter
+        # Need to figure out how to check if it will     
+        
 
-            ---------- CLOSE ------------
-            Tab x2 Close
-            Space
-            Enter
-            Esc
-            Enter x3
+    def _defer_ticket(self):
+        print("UNFINISHED DEFER TICKET FUNCTION")
+        
+        # defer checked
+        # create new window
+        # Have a defer time
+        # have a defer reason
+        # okay button to confirm
 
 
+        # for i in range(0,19):  
+        #     pyautogui.press('tab')
+        # pyautogui.press('space')
+        # time.sleep(5)
+        # pyautogui.press('enter')
+        # pyautogui.hotkey('ctrl', 'd')
+        # pyautogui.typewrite('pix')
+        # #pyautogui.press('enter') 
 
-            #Check if closing or deferring
 
-            I attempted to test test customers test
-            verified that the test was a successful test
-            changed test settings to test to fix problem.
+        # ---------- DEFER -------------
+        #     Tab x3 Defer (Might be 12?)
+        #     Space
+        #     Grab Defer Time (Set to 5 second pause)
+        #     Enter
+        #     Defer Reason - i range(0-7)
+        #     down x(i)
+        #     enter
+        #     Control + d
+        #     'pix'
+        #     Enter
+    
+        
+    def _insert_ticket_schema(self):
+        #########Format All text to conform to ticket standards#######
+        ##############################################################
 
+        self.textBox1.insert(1.0, "===============\nREASON CALLING\n===============\n")
+        for i in range(0, (int(self.textBox1.index('end').split('.')[0]) - 1)):
+            self.textBox1.insert(i+1.0, "@ ")
+        self.textBox1.insert('end', "\n\n")
 
-        '''
+        self.textBox2.insert(1.0, "================\nATTEMPTED STEPS\n================\n")
+        for i in range(0, (int(self.textBox2.index('end').split('.')[0]) - 1)):
+            self.textBox2.insert(i+1.0, "! ")
+        self.textBox2.insert('end', "\n\n")
+
+        self.textBox3.insert(1.0, "=================\nRESOLUTION STEPS\n=================\n")
+        for i in range(0, (int(self.textBox3.index('end').split('.')[0]) - 1)):
+            self.textBox3.insert(i+1.0, "- ") 
+        self.textBox3.insert('end', "\n\n")   
+
+        self.text_reason_calling = self.textBox1.get(1.0, 'end') 
+        self.text_attempted_steps = self.textBox2.get(1.0, 'end')
+        self.text_resolution_steps = self.textBox3.get(1.0, 'end')
+
 
     def _refresh_clarify(self):
 
-        #Ensure clarify taskbar icon coords are saved
+        #Ensure clarify taskbar icon coords are saved via pixelsearching or explicitly
         if self.clarifyLocation is None:
             self._locateClarify(False)
 
