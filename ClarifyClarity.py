@@ -1,7 +1,8 @@
 
-#Added Colors - updated the GUI color scheme
-#Revised clarifyicon searching.
-    #Checks for the icon, if it can't find it, it then will ask to move the mouse over the icon and save the location
+#Added error function to display error messages in a new window
+#Added in defer window to set defer time
+#Added in close window to set closing codes
+#Added in function to close child window(s)
 
 
 
@@ -12,12 +13,12 @@
 '''
 
 
-import tkinter
-import re
-import pyautogui
-import pyperclip
-import time
-import os
+import tkinter       #GUI
+#import re           #Unused right now
+import pyautogui     #Automate keyboard and mouse evetns
+import pyperclip     #Send text to clipboard
+import time          #get current times and sleep function
+import os            #Fetch File Path
  
 class ClarifySimplify(tkinter.Frame):
  
@@ -26,8 +27,6 @@ class ClarifySimplify(tkinter.Frame):
         self.parent = parent
  
         self._initialize()  
-
-        #print('{}, {}'.format(self.screenWidth, self.screenHeight))
         parent.geometry('{}x{}'.format(round(self.screenWidth/1.5), round(self.screenHeight/1.5)))
 
  
@@ -50,8 +49,6 @@ class ClarifySimplify(tkinter.Frame):
         self.screenWidth = self.winfo_screenwidth()
         self.screenHeight = self.winfo_screenheight()
         self.clarifyIconQueue = self._makeRegion(0, 0, round(self.screenWidth*.288), round(self.screenHeight/2))
-
-        #self.clarifyIconPixel = None
 
         textBoxLabel1 = tkinter.Label(text='Reason Calling', bg=self.colorDarkBackground, fg=self.colorLimeText, font = self.defaultFont)
         textBoxLabel1.grid(row=0, column=0, sticky='SNEW')
@@ -89,8 +86,9 @@ class ClarifySimplify(tkinter.Frame):
         self.checkBox_CloseTicket.grid(column=1, row=2)
 
         self.checkDeferTicket = None
-        self.checkBox_DeferTicket = tkinter.Checkbutton(text='Defer Ticket', variable=self.checkDeferTicket, onvalue="True", offvalue="False", bg=self.colorDarkBackground, fg=self.colorOrangeText, font=self.defaultFont, highlightbackground=self.colorDarkBackground)
+        self.checkBox_DeferTicket = tkinter.Checkbutton(text='Defer Ticket', variable=self.checkDeferTicket, onvalue="True", offvalue="False", bg=self.colorDarkBackground, fg=self.colorOrangeText, font=self.defaultFont, highlightbackground=self.colorDarkBackground, command=self._defer_ticket)
         self.checkBox_DeferTicket.grid(column=1, row=4)
+
    
         self._locateClarify(True)
 
@@ -133,7 +131,10 @@ class ClarifySimplify(tkinter.Frame):
             self.clarifyLocation = pyautogui.position()
             self.windowLocateClarify.destroy()
         else:
-            return
+            print(event)
+            print(event)
+            print(event)
+        
 
 
     def _delete_all_text(self):
@@ -144,10 +145,8 @@ class ClarifySimplify(tkinter.Frame):
 
     def _send_to_clarify(self):
         
-        self._insert_ticket_schema() 
-
+        self._insert_ticket_schema()
         self._setup_ticket()
-
         if self.checkBox_CloseTicket==True: #Check which checkbox is active
             self._close_ticket()
         else:
@@ -164,9 +163,11 @@ class ClarifySimplify(tkinter.Frame):
         pyautogui.hotkey('ctrl', 'h')
         time.sleep(.5)
         pyautogui.click(self.screenWidth*.5, self.screenHeight*.6) #Select correct text box for tab positioning
+
         for i in range(0,6):
             pyautogui.press('tab')
         pyautogui.press('down') #Change from incoming to outgoing
+
         for i in range(0,3):
             pyautogui.press('tab')
         
@@ -177,6 +178,7 @@ class ClarifySimplify(tkinter.Frame):
         pyautogui.hotkey('ctrl', 'v')
         pyperclip.copy(self.text_resolution_steps)
         pyautogui.hotkey('ctrl', 'v')
+
         for i in range(0,2): #3 tabs to hit hangup
             pyautogui.press('tab')
         pyautogui.press('space') #press hangup
@@ -208,10 +210,17 @@ class ClarifySimplify(tkinter.Frame):
         # enter x2
         # tabx3 closing codes
 
-        #     Verifone Reboot Close codes
-        #     h, h, e, e, e, h, 3, 3, p 
-        #     Online Ordering
-        #     h, s, o, h, px6, p
+        #Verifone Reboot Close codes
+        #       h, h, e, e, e, h, 3, 3, p 
+        #Online Ordering restart
+        #       h, s, o, h, px6, p
+        #Smart Receipt
+        #       h, s, c, h, px6, p
+        #Generic Open/Close
+        #       h, o, o, o, h, cx4, p
+        #NTOCB
+        #       h, o, n, h, cx4, p
+
 
 
         # tabx6
@@ -221,6 +230,8 @@ class ClarifySimplify(tkinter.Frame):
         
 
     def _defer_ticket(self):
+
+        self._window_defer_time()
         print("UNFINISHED DEFER TICKET FUNCTION")
         
         # defer checked
@@ -236,6 +247,7 @@ class ClarifySimplify(tkinter.Frame):
         # time.sleep(5)
         # pyautogui.press('enter')
         # pyautogui.hotkey('ctrl', 'd')
+
         # pyautogui.typewrite('pix')
         # #pyautogui.press('enter') 
 
@@ -288,12 +300,78 @@ class ClarifySimplify(tkinter.Frame):
             clarifyRefreshColumnLocation = (self.screenWidth * .2), (self.screenHeight * .4)
             pyautogui.click(self.clarifyLocation)
             pyautogui.click(clarifyRefreshColumnLocation)
-            pyautogui.moveTo(currentMousePosition) ###ONLY MOVES WITHIN PRIMARY SCREEN##
+            pyautogui.moveTo(currentMousePosition) ###ONLY MOVES WITHIN PRIMARY MONITOR##
             pyautogui.press('p')
-            #time.sleep(.5)
             pyautogui.press('p')
             time.sleep(.25)
-            pyautogui.hotkey('alt', 'tab') #return to this program#
+            pyautogui.hotkey('alt', 'tab') #return to this program# -- Doesn't seem to work 100% of the time.
+
+    def _window_error(self, errorMessage):
+        self.windowError = tkinter.Toplevel()
+        self.windowError.resizable(0,0)
+        self.windowError.title('!#!ERROR!#!')
+        self.windowError.grid()
+        self.errorLabel = tkinter.Label(self.windowError, fg = self.colorPurpleText, font=self.textWidgetFont, text=errorMessage)
+        self.errorLabel.grid(column=0, row=0)
+
+        self.buttonOkay = tkinter.Button(self.windowError, text='Close', command=self._destroy_window(self.windowError))
+        self.buttonOkay.grid(row=1, column=0)
+
+        print("UNFINISHED FUNCTION")
+
+    def _window_closure_code(self):
+        print("UNFINISHED FUNCTION")
+
+    def _window_defer_time(self):
+        self.windowDeferTime = tkinter.Toplevel()
+        print(self.windowDeferTime)
+        print("SEPARATE")
+        self.windowDeferTime.title("Set a defer time")
+        self.windowDeferTime.grid()
+        #self.windowDeferTime.bind_all(('tab', self._keyboard_handler))
+
+        #All input fields
+        self.dayInput = tkinter.Entry(self.windowDeferTime, fg = self.colorPurpleText, font=self.defaultFont)
+        self.dayInput.grid(column=0, row=0, sticky='W')
+
+        self.monthInput = tkinter.Entry(self.windowDeferTime, fg=self.colorPurpleText, bg=self.colorDarkBackground)
+        self.dayInput.grid(column=0, row=0)
+
+        self.yearInput = tkinter.Entry(self.windowDeferTime, fg=self.colorPurpleText, bg=self.colorDarkBackground)
+        self.dayInput.grid(column=0, row=0, sticky='E')
+
+        self.hourInput = tkinter.Entry(self.windowDeferTime, fg=self.colorPurpleText, bg=self.colorDarkBackground)
+        self.dayInput.grid(column=0, row=1, sticky='W')
+
+        self.minuteInput = tkinter.Entry(self.windowDeferTime, fg=self.colorPurpleText, bg=self.colorDarkBackground)
+        self.dayInput.grid(column=0, row=1)
+
+        self.buttonClose = tkinter.Button(self.windowDeferTime) 
+        self.buttonClose.grid(column=0, row=2, sticky='S')
+        #Error checking for not digit
+        if str.isdigit(self.dayInput.get()) == False:
+            self._window_error('Day is incorrect, Please input a value between 1-31')
+
+        elif str.isdigit(self.monthInput.get()) == False:
+            self._window_error('Month is incorrect, Please input a value between 1-31')
+
+        elif str.isdigit(self.yearInput.get()) == False:
+            self._window_error('Year is incorrect, Please input a value between 1-31')
+
+        elif str.isdigit(self.hourInput.get()) == False:
+            self._window_error('Hour is incorrect, Please input a value between 1-31')
+
+        elif str.isdigit(self.minuteInput.get()) == False:
+            self._window_error('Minute is incorrect, Please input a value between 1-31')
+
+        
+
+
+        print("UNFINISHED FUNCTION")
+
+    def _destroy_window(self, window):
+        print(window)
+        window.destroy()
 
             
 
@@ -314,7 +392,6 @@ if __name__ == "__main__":
 
     application = ClarifySimplify(root)
     application.grid()
-    application.configure
     application.mainloop()
 
 
