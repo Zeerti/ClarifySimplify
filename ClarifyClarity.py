@@ -13,12 +13,13 @@
 '''
 
 
-import tkinter       #GUI
-#import re           #Unused right now
-import pyautogui     #Automate keyboard and mouse evetns
-import pyperclip     #Send text to clipboard
-import time          #get current times and sleep function
-import os            #Fetch File Path
+import tkinter              #GUI
+#import re                  #Unused right now
+import pyautogui            #Automate keyboard and mouse evetns
+import pyperclip            #Send text to clipboard
+import time                 #get current times and sleep function
+import os                   #Fetch File Path
+
  
 class ClarifySimplify(tkinter.Frame):
  
@@ -81,12 +82,12 @@ class ClarifySimplify(tkinter.Frame):
         self.button_RefreshClarify = tkinter.Button(text='Refresh Clarify', command = self._refresh_clarify)
         self.button_RefreshClarify.grid(row=6, column=0, sticky='S' )
 
-        self.checkCloseTicket = None
-        self.checkBox_CloseTicket = tkinter.Checkbutton(text='Close Ticket', variable=self.checkCloseTicket, onvalue="True", offvalue="False", bg=self.colorDarkBackground, fg=self.colorOrangeText, font=self.defaultFont)
+        self.checkCloseTicket = tkinter.StringVar()
+        self.checkBox_CloseTicket = tkinter.Checkbutton(text='Close Ticket', variable=self.checkCloseTicket, onvalue=True, offvalue=False, bg=self.colorDarkBackground, fg=self.colorOrangeText, font=self.defaultFont)
         self.checkBox_CloseTicket.grid(column=1, row=2)
 
-        self.checkDeferTicket = None
-        self.checkBox_DeferTicket = tkinter.Checkbutton(text='Defer Ticket', variable=self.checkDeferTicket, onvalue="True", offvalue="False", bg=self.colorDarkBackground, fg=self.colorOrangeText, font=self.defaultFont, highlightbackground=self.colorDarkBackground, command=self._defer_ticket)
+        self.checkDeferTicket = tkinter.StringVar()
+        self.checkBox_DeferTicket = tkinter.Checkbutton(text='Defer Ticket', variable=self.checkDeferTicket, onvalue=True, offvalue=False, bg=self.colorDarkBackground, fg=self.colorOrangeText, font=self.defaultFont, highlightbackground=self.colorDarkBackground, command=self._defer_ticket)
         self.checkBox_DeferTicket.grid(column=1, row=4)
 
    
@@ -129,7 +130,8 @@ class ClarifySimplify(tkinter.Frame):
     def _keyboard_handler(self, event):
         if event.keysym == '1':
             self.clarifyLocation = pyautogui.position()
-            self.windowLocateClarify.destroy()
+            #self.windowLocateClarify.destroy()
+            self._destroy_window(self.windowLocateClarify)
         else:
             print(event)
             print(event)
@@ -226,10 +228,11 @@ class ClarifySimplify(tkinter.Frame):
         # tabx6
         # enter
 
-        # Need to figure out how to check if it will     
+            
         
 
     def _defer_ticket(self):
+
 
         self._window_defer_time()
         print("UNFINISHED DEFER TICKET FUNCTION")
@@ -241,8 +244,21 @@ class ClarifySimplify(tkinter.Frame):
         # okay button to confirm
 
 
-        # for i in range(0,19):  
-        #     pyautogui.press('tab')
+        for i in range(0,19):
+            pyautogui.press('tab')
+        pyautogui.typewrite(self.monthInput)
+        pyautogui.press('tab')
+        pyautogui.typewrite(self.dayInput)
+        pyautogui.press('tab')
+        pyautogui.typewrite(self.yearInput)
+        pyautogui.press('tab')
+        pyautogui.typewrite(self.hourInput)
+        pyautogui.press('tab')
+        pyautogui.typewrite(self.minuteInput)
+        pyautogui.press('enter')
+
+
+            
         # pyautogui.press('space')
         # time.sleep(5)
         # pyautogui.press('enter')
@@ -251,6 +267,14 @@ class ClarifySimplify(tkinter.Frame):
         # pyautogui.typewrite('pix')
         # #pyautogui.press('enter') 
 
+        #Hang up - Tab 18 times
+        #Space 
+        #month, day, year, hour, minute
+        #enter
+        #Defer Reason
+        #control D
+        #'pix'
+        #enter
 
         # ---------- DEFER -------------
         #     Tab x3 Defer (Might be 12?)
@@ -291,7 +315,7 @@ class ClarifySimplify(tkinter.Frame):
 
     def _refresh_clarify(self):
 
-        #Ensure clarify taskbar icon coords are saved via pixelsearching or explicitly
+        #Ensure clarify taskbar icon coords are saved via pixelsearching or explicitly setting with mouse cursor
         if self.clarifyLocation is None:
             self._locateClarify(False)
 
@@ -310,11 +334,12 @@ class ClarifySimplify(tkinter.Frame):
         self.windowError = tkinter.Toplevel()
         self.windowError.resizable(0,0)
         self.windowError.title('!#!ERROR!#!')
+        self.windowError.configure(bg=self.colorDarkBackground)
         self.windowError.grid()
-        self.errorLabel = tkinter.Label(self.windowError, fg = self.colorPurpleText, font=self.textWidgetFont, text=errorMessage)
+        self.errorLabel = tkinter.Label(self.windowError, fg = self.colorBlueText, font=self.textWidgetFont, text=errorMessage, background=self.colorRedText)
         self.errorLabel.grid(column=0, row=0)
 
-        self.buttonOkay = tkinter.Button(self.windowError, text='Close', command=self._destroy_window(self.windowError))
+        self.buttonOkay = tkinter.Button(self.windowError, text='Close', command= lambda: self._destroy_window(self.windowError))
         self.buttonOkay.grid(row=1, column=0)
 
         print("UNFINISHED FUNCTION")
@@ -323,55 +348,93 @@ class ClarifySimplify(tkinter.Frame):
         print("UNFINISHED FUNCTION")
 
     def _window_defer_time(self):
-        self.windowDeferTime = tkinter.Toplevel()
-        print(self.windowDeferTime)
-        print("SEPARATE")
-        self.windowDeferTime.title("Set a defer time")
-        self.windowDeferTime.grid()
-        #self.windowDeferTime.bind_all(('tab', self._keyboard_handler))
+        #Check if unchecking box. If true, then it is being unchecked. Do not display defer time box.
+        if self.checkDeferTicket.get() == '0':
+            return
 
-        #All input fields
-        self.dayInput = tkinter.Entry(self.windowDeferTime, fg = self.colorPurpleText, font=self.defaultFont)
-        self.dayInput.grid(column=0, row=0, sticky='W')
+        elif self.checkDeferTicket.get() == '1':
 
-        self.monthInput = tkinter.Entry(self.windowDeferTime, fg=self.colorPurpleText, bg=self.colorDarkBackground)
-        self.dayInput.grid(column=0, row=0)
-
-        self.yearInput = tkinter.Entry(self.windowDeferTime, fg=self.colorPurpleText, bg=self.colorDarkBackground)
-        self.dayInput.grid(column=0, row=0, sticky='E')
-
-        self.hourInput = tkinter.Entry(self.windowDeferTime, fg=self.colorPurpleText, bg=self.colorDarkBackground)
-        self.dayInput.grid(column=0, row=1, sticky='W')
-
-        self.minuteInput = tkinter.Entry(self.windowDeferTime, fg=self.colorPurpleText, bg=self.colorDarkBackground)
-        self.dayInput.grid(column=0, row=1)
-
-        self.buttonClose = tkinter.Button(self.windowDeferTime) 
-        self.buttonClose.grid(column=0, row=2, sticky='S')
-        #Error checking for not digit
-        if str.isdigit(self.dayInput.get()) == False:
-            self._window_error('Day is incorrect, Please input a value between 1-31')
-
-        elif str.isdigit(self.monthInput.get()) == False:
-            self._window_error('Month is incorrect, Please input a value between 1-31')
-
-        elif str.isdigit(self.yearInput.get()) == False:
-            self._window_error('Year is incorrect, Please input a value between 1-31')
-
-        elif str.isdigit(self.hourInput.get()) == False:
-            self._window_error('Hour is incorrect, Please input a value between 1-31')
-
-        elif str.isdigit(self.minuteInput.get()) == False:
-            self._window_error('Minute is incorrect, Please input a value between 1-31')
-
-        
+            self.windowDeferTime = tkinter.Toplevel()
+            self.windowDeferTime.config(background=self.colorDarkBackground)
+            self.windowDeferTime.title("Set a defer time")
+            self.windowDeferTime.grid()
 
 
-        print("UNFINISHED FUNCTION")
+            #All input fields
+            self.dayInput = tkinter.Entry(self.windowDeferTime, fg = self.colorPurpleText, bg=self.colorDarkBackground, )
+            self.dayInput.grid(column=0, row=0, stick='EW', padx=5, pady=5)
+            self.dayInput.insert(0, 'Day')
+
+            self.monthInput = tkinter.Entry(self.windowDeferTime, fg=self.colorPurpleText, bg=self.colorDarkBackground)
+            self.monthInput.grid(column=1, row=0, stick='EW', padx=5, pady=5)
+            self.monthInput.insert(0,'Month')
+
+            self.yearInput = tkinter.Entry(self.windowDeferTime, fg=self.colorPurpleText, bg=self.colorDarkBackground)
+            self.yearInput.grid(column=2, row=0, stick='EW', padx=5, pady=5)
+            self.yearInput.insert(0,'Year')
+
+            self.hourInput = tkinter.Entry(self.windowDeferTime, fg=self.colorPurpleText, bg=self.colorDarkBackground)
+            self.hourInput.grid(column=0, row=1, stick='EW', padx=5, pady=5)
+            self.hourInput.insert(0,'Hour(24)')
+
+            self.minuteInput = tkinter.Entry(self.windowDeferTime, fg=self.colorPurpleText, bg=self.colorDarkBackground)
+            self.minuteInput.grid(column=1, row=1, stick='EW', padx=5, pady=5)
+            self.minuteInput.insert(0,'Minute')
+
+            self.buttonClose = tkinter.Button(self.windowDeferTime, text='Set Time', command=self._save_defer_times) 
+            self.buttonClose.grid(column=1, row=3, stick='S', pady=10)
+
+            self.deferReason = ("Monitoring", "Not Applicable", "Busy/No Answer", "Customer Scheduled", "Researching", "Escalated", "Par Scheduled")
+            self.listboxDeferReason = tkinter.Listbox(self.windowDeferTime)
+            self.listboxDeferReason.grid(column=0, row=2, pady=10)
+            for items in self.deferReason:
+                self.listboxDeferReason.insert('end', items)
+
+
+            
+
+
+
+           
+            
+            print("UNFINISHED FUNCTION")
 
     def _destroy_window(self, window):
         print(window)
         window.destroy()
+
+    def _save_defer_times(self):
+        passed = True
+        if str.isdigit(self.dayInput.get()) == True:
+            if self.dayInput.get() > 31 or self.dayInput.get() < 0:
+                self._window_error('Day is incorrect, Please input a value between 1-31')
+                passed = False
+
+        elif str.isdigit(self.monthInput.get()) == False:
+
+            self._window_error('Month is incorrect, Please input a value between 1-31')
+            passed = False
+
+        elif str.isdigit(self.yearInput.get()) == False:
+            self._window_error('Year is incorrect, Please input a value between 1-31')
+            passed = False
+
+        elif str.isdigit(self.hourInput.get()) == False:
+            self._window_error('Hour is incorrect, Please input a value between 1-31')
+            passed = False
+
+        elif str.isdigit(self.minuteInput.get()) == False:
+            self._window_error('Minute is incorrect, Please input a value between 1-31')
+            passed = False
+
+        if passed == True:
+            self._destroy_window(self.windowDeferTime)
+
+        print("UNFINISHED FUNCTION _save_defer_times") #Finish errorchecking
+
+
+
+
 
             
 
@@ -385,6 +448,7 @@ if __name__ == "__main__":
     root.columnconfigure(0, weight=1)
     for i in range(0,7):
         root.rowconfigure(i, weight=1)
+    
     defaultbg = '#263238'
     root.configure(bg=defaultbg)
     root.update()
